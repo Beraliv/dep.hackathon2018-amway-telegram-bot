@@ -1,9 +1,10 @@
-let token = process.env.TOKEN
+const axios = require('axios');
+const token = process.env.TOKEN
 
-let TelegramBot = require('node-telegram-bot-api')
+const TelegramBot = require('node-telegram-bot-api')
 let bot = new TelegramBot(token, { polling: true })
 
-console.log('Bot server started')
+console.log('Bot server started in the ' + process.env.NODE_ENV + ' mode');
 
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
@@ -50,6 +51,19 @@ bot.onText(/start/, (msg) => {
   })
 })
 
+bot.onText(/give/, async (msg) => {
+  const roomId = 743;
+  const id = msg.chat.id
+  let currentData
+  await axios.get('http://10.66.168.97:8030/data/latest/743')
+    .then(response => {
+      currentData = response.data
+    })
+    .catch(error => console.log('some error', error))
+  
+  bot.sendMessage(id, `Прямо сейчас в комнате "${roomId}": температура ${currentData.tmp}, содержание CO2 ${currentData.co2}, и яркость света ${currentData.light}`);
+});
+
 bot.onText(answerFrom(rooms), (msg) => {
   const name = msg.from.first_name
   const id = msg.chat.id
@@ -76,3 +90,5 @@ bot.onText(answerFrom(actions), (msg) => {
 
   bot.sendMessage(id, `${name}, я понял, в ${state[id].room} комнате нужно ${contractions[msg.text]}`)
 })
+
+module.exports = bot
