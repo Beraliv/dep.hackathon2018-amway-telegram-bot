@@ -1,0 +1,25 @@
+{
+  "name": "dep.hackathon2018-amway-telegram-bot",
+  "version": "1.0.0",
+  "description": "Make It Digital hackathon, Amway, telegram bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot.git"
+  },
+  "keywords": [
+    "dep.hackathon2018",
+    "amway",
+    "telegram",
+    "bot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/issues"
+  },
+  "homepage": "https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot#readme"
+}
