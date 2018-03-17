@@ -4,7 +4,8 @@
   "description": "Make It Digital hackathon, Amway, telegram bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "env.cmd && node index.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/issues"
   },
-  "homepage": "https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot#readme"
+  "homepage": "https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.30.0"
+  }
 }
