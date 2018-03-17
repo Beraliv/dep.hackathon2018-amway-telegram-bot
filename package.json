@@ -24,6 +24,9 @@
   },
   "homepage": "https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot#readme",
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
     "node-telegram-bot-api": "^0.30.0"
   }
 }
