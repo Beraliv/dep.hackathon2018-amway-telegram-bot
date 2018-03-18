@@ -9,6 +9,12 @@ const flatMap = arr => arr.reduce(
   (acc, arr) => [...acc, ...arr],
   []
 )
+const actions = [
+  ['t↑ (too cold)', 't↓ (too hot)'],
+  ['CO2↑ (too fresh)', 'CO2↓ (too airless)'],
+  ['L↑ (too dark)', 'L↓ (too light)'],
+]
+console.log(flatMap(actions))
 
 const token = process.env.TOKEN
 
@@ -22,28 +28,56 @@ const getBot = (app) => {
   const state = {}
   const rooms = [['743']]
   const actions = [
-    ['t↑ (cold)', 't↓ (hot)'],
-    ['CO2↑ (fresh)', 'CO2↓ (airless)'],
-    ['L↑ (dark)', 'L↓ (light)'],
+    ['t↑ (too cold)', 't↓ (too hot)'],
+    ['CO2↑ (too fresh)', 'CO2↓ (too airless)'],
+    ['L↑ (too dark)', 'L↓ (too light)'],
   ]
-  const flattenActions = flatMap(actions)
-  const contractions = flattenActions.reduce((acc, choice) => {
-    const contraction = flattenActions.indexOf(choice) % 2 === 0
-      ? 'increase'
-      : 'descrease'
-    const subject = choice.slice(0, 1) === 't'
-      ? 'temperature'
-      : choice.slice(0, 1) === 'L'
-        ? 'luminosity'
-        : 'carbon dioxide content'
+  const contractions = {
+    't↑ (too cold)': 'closeWindow',
+    't↓ (too hot)': 'openWindow',
+    'CO2↑ (too fresh)': 'closeWindow',
+    'CO2↓ (too airless)': 'openWindow',
+    'L↑ (too dark)': 'turnOnLight',
+    'L↓ (too light)': 'turnOffLight'
+  };
+  const contractionTexts = {
+    't↑ (too cold)': {
+      do: 'Window is closed',
+      undo: 'Window isn\'t closed'
+    },
+    't↓ (too hot)': {
+      do: 'Window is opened',
+      undo: 'Window isn\'t opened'
+    },
+    'CO2↑ (too fresh)': {
+      do: 'Window is closed',
+      undo: 'Window isn\'t closed'
+    },
+    'CO2↓ (too airless)': {
+      do: 'Window is opened',
+      undo: 'Window isn\'t opened'
+    },
+    'L↑ (too dark)': {
+      do: 'Light is on',
+      undo: 'Light isn\'t on'
+    },
+    'L↓ (too light)': {
+      do: 'Light is off',
+      undo: 'Light isn\'t off'
+    }
+  };
+  const roomIds = []
 
-    acc[choice] = [contraction, subject].join(' ')
-    return acc
-  }, {})
+  const addRoomIfAbsent = (rooms, roomId) => {
+    if (!rooms.includes(roomId)) {
+      rooms.push(roomId)
+    }
+  }
 
   bot.onText(/start/, (msg) => {
     const name = msg.from.first_name
     const id = msg.chat.id
+    addRoomIfAbsent(roomIds, id)
 
     bot.sendMessage(id, `Hi, ${name}! Which room are you in?`, {
       reply_markup: {
@@ -56,17 +90,20 @@ const getBot = (app) => {
   bot.onText(/get/, async (msg) => {
     const roomId = 743;
     const id = msg.chat.id
+    addRoomIfAbsent(roomIds, id)
+
     try {
       const { data: [{ tmp, co2, light }] } = await axios.get('http://10.66.170.54:8030/data/latest/743');
       if (!tmp || !co2 || !light) {
         throw new Error('Data is not fully initialized error');
       }
-      bot.sendMessage(id, `
-        In room ${roomId}
-        temperature (t): ${tmp}°C
-        carbon dioxide content (CO2): ${co2}ppm
-        luminosity (L): ${light}lm
-      `);
+
+      const str = `In room ${roomId}\n`
+        + `Temperature: ${tmp}°C\n`
+        + `CO2 content: ${co2}ppm\n`
+        + `Luminosity: ${light}lm`;
+
+      bot.sendMessage(id, str);
     } catch (error) {
       console.log('Latest data is not available', error)
       bot.sendMessage(id, 'Latest data is not available');
@@ -76,6 +113,7 @@ const getBot = (app) => {
   bot.onText(answerFrom(rooms), (msg) => {
     const name = msg.from.first_name
     const id = msg.chat.id
+    addRoomIfAbsent(roomIds, id)
 
     // which room
     state[id] = {
@@ -90,20 +128,30 @@ const getBot = (app) => {
     })
   })
 
-  bot.onText(answerFrom(actions), (msg) => {
+  bot.onText(answerFrom(actions), async (msg) => {
     const name = msg.from.first_name
     const id = msg.chat.id
+    addRoomIfAbsent(roomIds, id)
 
     // which action
     state[id].action = msg.text
 
-    bot.sendMessage(id, `${name}, I got it, in room ${state[id].room} it's need to ${contractions[msg.text]}`)
+    // send event for triggering to server
+    try {
+      const response = await axios.post('http://10.66.170.54:8030/action/743', {
+        action: contractions[msg.text]
+      });
+      bot.sendMessage(id, contractionTexts[msg.text].do);
+    } catch (error) {
+      console.log(contractionTexts[msg.text].do, error)
+      bot.sendMessage(id, contractionTexts[msg.text].undo);
+    }
   })
 
   app.post('/extreme', (req, res) => {
     const {
       conditions: {
-        name,
+        id,
         minComfortValue,
         maxComfortValue,
         measure
@@ -111,18 +159,23 @@ const getBot = (app) => {
       value
     } = req.body;
 
-    const verb = minComfortValue > value
-      ? `is below the minimum comfort value (${minComfortValue}${measure})`
-      : `is greater than the maximum comfort value (${maxComfortValue}${measure})`;
+    const result = minComfortValue > value
+      ? `too low`
+      : `too high`;
 
-    bot.sendMessage(id, `
-      Extreme value is found
-      ${name}: current value (${value}${measure}) ${verb}
+    if (roomIds.length) {
+      roomIds.forEach(roomId => {
+        const str = `${id}\n`
+          + `${value} is ${result}\n`
+          + 'Use **\/start** to choose action';
 
-      It's highly recommended to vote (command **\/start**)
-    `)
+        bot.sendMessage(roomId, str)
+      })
+      
+      res.status(200).send('Extreme values are sent to all rooms');
+    }
 
-    app.status(200).send('extreme is done');
+    res.status(200).send('Extreme values aren\'t sent (no recipients found)');
   })
 }
 
