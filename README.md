@@ -55,7 +55,7 @@ In room 743
 
 If extreme value is found (i.e. too high temperature), extreme value is sent
 
-![Extreme message](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-help.png)
+![Extreme message](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-extreme.png)
 
 ## Help
 
