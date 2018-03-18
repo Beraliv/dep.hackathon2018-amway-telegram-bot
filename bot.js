@@ -56,19 +56,21 @@ const getBot = (app) => {
   bot.onText(/get/, async (msg) => {
     const roomId = 743;
     const id = msg.chat.id
-    let currentData
-    await axios.get('http://10.66.168.97:8030/data/latest/743')
-      .then(response => {
-        currentData = response.data
-      })
-      .catch(error => console.log('some error', error))
-    
-    bot.sendMessage(id, `
-      In room ${roomId}
-      temperature (t): ${currentData.tmp}°C
-      carbon dioxide content (CO2): ${currentData.co2}ppm
-      luminosity (L): ${currentData.light}lm
-    `);
+    try {
+      const { data: [{ tmp, co2, light }] } = await axios.get('http://10.66.170.54:8030/data/latest/743');
+      if (!tmp || !co2 || !light) {
+        throw new Error('Data is not fully initialized error');
+      }
+      bot.sendMessage(id, `
+        In room ${roomId}
+        temperature (t): ${tmp}°C
+        carbon dioxide content (CO2): ${co2}ppm
+        luminosity (L): ${light}lm
+      `);
+    } catch (error) {
+      console.log('Latest data is not available', error)
+      bot.sendMessage(id, 'Latest data is not available');
+    }
   });
 
   bot.onText(answerFrom(rooms), (msg) => {
@@ -97,9 +99,34 @@ const getBot = (app) => {
 
     bot.sendMessage(id, `${name}, I got it, in room ${state[id].room} it's need to ${contractions[msg.text]}`)
   })
+
+  app.post('/extreme', (req, res) => {
+    const {
+      conditions: {
+        name,
+        minComfortValue,
+        maxComfortValue,
+        measure
+      },
+      value
+    } = req.body;
+
+    const verb = minComfortValue > value
+      ? `is below the minimum comfort value (${minComfortValue}${measure})`
+      : `is greater than the maximum comfort value (${maxComfortValue}${measure})`;
+
+    bot.sendMessage(id, `
+      Extreme value is found
+      ${name}: current value (${value}${measure}) ${verb}
+
+      It's highly recommended to vote (command **\/start**)
+    `)
+
+    app.status(200).send('extreme is done');
+  })
 }
 
 module.exports = {
   token,
-  getBot 
+  getBot
 };

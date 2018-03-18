@@ -12,10 +12,16 @@ app.get('/', function(req, res) {
 	res.json({ version: packageInfo.version });
 });
 
-const server = app.listen(process.env.PORT, '0.0.0.0', function() {
-	const host = server.address().address;
-	const port = server.address().port;
-	console.log('Web server started at http://%s:%s', host, port);
+const port = 8099;
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
+app.listen(port, function() {
+	console.log('Web server started at localhost:%s', port);
 });
 
 module.exports = function() {
