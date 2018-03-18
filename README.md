@@ -36,12 +36,7 @@ Alexey, what do you want to do?
 
 ![Stage 2](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-stage-2.png)
 
-**dep.hackathon2018-amway-telegram-bot**
-```
-Alexey, I got it, in room 743 it's need to descrease temperature
-```
-
-## Answer to `/get`
+## Conversation with `/get`
 
 **You**
 ```
@@ -55,3 +50,13 @@ In room 743
   carbon dioxide content (CO2): 620ppm
   luminosity (L): 330lm
 ```
+
+## Found extreme value
+
+If extreme value is found (i.e. too high temperature), extreme value is sent
+
+![Extreme message](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-help.png)
+
+## Help
+
+![Help](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-help.png)

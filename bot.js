@@ -152,7 +152,7 @@ const getBot = (app) => {
       roomIds.forEach(roomId => {
         const str = `${id}\n`
           + `${value} is ${result}\n`
-          + 'Use **\/start** to choose action';
+          + 'Use \/start to choose action';
 
         bot.sendMessage(roomId, str)
       })
