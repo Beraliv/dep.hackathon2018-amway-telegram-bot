@@ -22,20 +22,20 @@ const getBot = (app) => {
   const state = {}
   const rooms = [['743']]
   const actions = [
-    ['t↑ (холодно)', 't↓ (жарко)'],
-    ['CO2↑ (свежо)', 'CO2↓ (душно)'],
-    ['L↑ (темно)', 'L↓ (светло)'],
+    ['t↑ (cold)', 't↓ (hot)'],
+    ['CO2↑ (fresh)', 'CO2↓ (airless)'],
+    ['L↑ (dark)', 'L↓ (light)'],
   ]
   const flattenActions = flatMap(actions)
   const contractions = flattenActions.reduce((acc, choice) => {
     const contraction = flattenActions.indexOf(choice) % 2 === 0
-      ? 'повысить'
-      : 'понизить'
+      ? 'increase'
+      : 'descrease'
     const subject = choice.slice(0, 1) === 't'
-      ? 'температуру'
+      ? 'temperature'
       : choice.slice(0, 1) === 'L'
-        ? 'яркость света'
-        : 'содержание углекислого газа'
+        ? 'luminosity'
+        : 'carbon dioxide content'
 
     acc[choice] = [contraction, subject].join(' ')
     return acc
@@ -45,7 +45,7 @@ const getBot = (app) => {
     const name = msg.from.first_name
     const id = msg.chat.id
 
-    bot.sendMessage(id, `Привет, ${name}! В какой комнате ты находишься?`, {
+    bot.sendMessage(id, `Hi, ${name}! Which room are you in?`, {
       reply_markup: {
         keyboard: rooms,
         one_time_keyboard: true
@@ -53,7 +53,7 @@ const getBot = (app) => {
     })
   })
 
-  bot.onText(/give/, async (msg) => {
+  bot.onText(/get/, async (msg) => {
     const roomId = 743;
     const id = msg.chat.id
     let currentData
@@ -63,7 +63,12 @@ const getBot = (app) => {
       })
       .catch(error => console.log('some error', error))
     
-    bot.sendMessage(id, `Прямо сейчас в комнате "${roomId}": температура ${currentData.tmp}, содержание CO2 ${currentData.co2}, и яркость света ${currentData.light}`);
+    bot.sendMessage(id, `
+      In room ${roomId}
+      temperature (t): ${currentData.tmp}°C
+      carbon dioxide content (CO2): ${currentData.co2}ppm
+      luminosity (L): ${currentData.light}lm
+    `);
   });
 
   bot.onText(answerFrom(rooms), (msg) => {
@@ -75,7 +80,7 @@ const getBot = (app) => {
       room: msg.text
     }
 
-    bot.sendMessage(id, `${name}, что ты хочешь сделать?`, {
+    bot.sendMessage(id, `${name}, what do you want to do?`, {
       reply_markup: {
         keyboard: actions,
         one_time_keyboard: true
@@ -90,7 +95,7 @@ const getBot = (app) => {
     // which action
     state[id].action = msg.text
 
-    bot.sendMessage(id, `${name}, я понял, в ${state[id].room} комнате нужно ${contractions[msg.text]}`)
+    bot.sendMessage(id, `${name}, I got it, in room ${state[id].room} it's need to ${contractions[msg.text]}`)
   })
 }
 
