@@ -28,8 +28,8 @@ const getBot = (app) => {
   const contractions = {
     'Open window': 'openWindow',
     'Close window': 'closeWindow',
-    'Turn on light': 'turnOnLight',
-    'Turn off light': 'turnOffLight'
+    'Turn on light': 'lowLight',
+    'Turn off light': 'highLight'
   };
   const contractionTexts = {
     'Open window': {
