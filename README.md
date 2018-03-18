@@ -24,6 +24,7 @@ Hi, Alexey! Which room are you in?
 ```
 
 **You** (on keyboard choose a room `743`)
+
 ![Stage 1](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-stage-1.png)
 
 **dep.hackathon2018-amway-telegram-bot**
@@ -32,6 +33,7 @@ Alexey, what do you want to do?
 ```
 
 **You** (on keyboard choose `t↓ (hot)`)
+
 ![Stage 2](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-stage-2.png)
 
 **dep.hackathon2018-amway-telegram-bot**
