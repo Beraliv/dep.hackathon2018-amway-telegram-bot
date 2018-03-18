@@ -4,9 +4,10 @@ const bodyParser = require('body-parser');
 const { token, getBot } = require('./bot');
 
 const app = express();
-const bot = getBot(app);
 
 app.use(bodyParser.json());
+
+const bot = getBot(app);
 
 app.get('/', function(req, res) {
 	res.json({ version: packageInfo.version });
