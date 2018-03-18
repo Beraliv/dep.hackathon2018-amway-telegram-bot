@@ -9,12 +9,6 @@ const flatMap = arr => arr.reduce(
   (acc, arr) => [...acc, ...arr],
   []
 )
-const actions = [
-  ['t↑ (too cold)', 't↓ (too hot)'],
-  ['CO2↑ (too fresh)', 'CO2↓ (too airless)'],
-  ['L↑ (too dark)', 'L↓ (too light)'],
-]
-console.log(flatMap(actions))
 
 const token = process.env.TOKEN
 
@@ -28,40 +22,29 @@ const getBot = (app) => {
   const state = {}
   const rooms = [['743']]
   const actions = [
-    ['t↑ (too cold)', 't↓ (too hot)'],
-    ['CO2↑ (too fresh)', 'CO2↓ (too airless)'],
-    ['L↑ (too dark)', 'L↓ (too light)'],
+    ['Open window', 'Close window'],
+    ['Turn on light', 'Turn off light'],
   ]
   const contractions = {
-    't↑ (too cold)': 'closeWindow',
-    't↓ (too hot)': 'openWindow',
-    'CO2↑ (too fresh)': 'closeWindow',
-    'CO2↓ (too airless)': 'openWindow',
-    'L↑ (too dark)': 'turnOnLight',
-    'L↓ (too light)': 'turnOffLight'
+    'Open window': 'openWindow',
+    'Close window': 'closeWindow',
+    'Turn on light': 'turnOnLight',
+    'Turn off light': 'turnOffLight'
   };
   const contractionTexts = {
-    't↑ (too cold)': {
-      do: 'Window is closed',
-      undo: 'Window isn\'t closed'
-    },
-    't↓ (too hot)': {
+    'Open window': {
       do: 'Window is opened',
       undo: 'Window isn\'t opened'
     },
-    'CO2↑ (too fresh)': {
+    'Close window': {
       do: 'Window is closed',
       undo: 'Window isn\'t closed'
     },
-    'CO2↓ (too airless)': {
-      do: 'Window is opened',
-      undo: 'Window isn\'t opened'
-    },
-    'L↑ (too dark)': {
+    'Turn on light': {
       do: 'Light is on',
       undo: 'Light isn\'t on'
     },
-    'L↓ (too light)': {
+    'Turn off light': {
       do: 'Light is off',
       undo: 'Light isn\'t off'
     }
@@ -136,6 +119,8 @@ const getBot = (app) => {
     // which action
     state[id].action = msg.text
 
+    console.log(`Action is sent: ${contractions[msg.text]}`)
+
     // send event for triggering to server
     try {
       const response = await axios.post('http://10.66.170.54:8030/action/743', {
@@ -157,7 +142,7 @@ const getBot = (app) => {
         measure
       },
       value
-    } = req.body;
+    } = req.body.data;
 
     const result = minComfortValue > value
       ? `too low`
