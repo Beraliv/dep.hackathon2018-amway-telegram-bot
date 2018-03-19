@@ -60,3 +60,13 @@ If extreme value is found (i.e. too high temperature), extreme value is sent
 ## Help
 
 ![Help](https://github.com/Beraliv/dep.hackathon2018-amway-telegram-bot/blob/master/images/tg-bot-help.png)
+
+## Other parts of the project
+
+- [API server](https://github.com/IgorKonovalov/dep.hackaton2018_api_server)
+- [Dashboard](https://github.com/OksanaFirtych/dep.hackatop2018_dashboard)
+- [Controller API server](https://github.com/alexeyMohnatkin/dep.hackaton2018_controller)
+
+## Code owners
+
+- [Alexey Berezin[(
